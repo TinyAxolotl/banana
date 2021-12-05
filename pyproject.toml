@@ -1,0 +1,19 @@
+[build-system]
+requires = ["poetry"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+authors = ["py <py@py>"]
+description = ""
+license = "MIT"
+name = "banana"
+version = "0.0.1"
+
+[[tool.poetry.packages]]
+include = "banana"
+
+[tool.poetry.scripts]
+banana-script = "banana:scripts.periodical_script"
+
+[tool.poetry.dependencies]
+requests = ""

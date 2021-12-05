@@ -1,0 +1,9 @@
+# Elder Scrolls Online Commadline Addon Manager
+
+Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater
+
+# Dependencies
+
+# Installation
+
+# Usage
