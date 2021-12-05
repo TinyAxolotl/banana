@@ -2,8 +2,38 @@
 
 Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater
 
+[MIT License](LICENSE)
+
 # Dependencies
 
-# Installation
+```
+python3-pip
+```
+
+# Linux Installation
+
+# Windows Installation
 
 # Usage
+
+# Linux Development
+
+Use docker to test the python components.
+For docker installation run the following commands on [Ubuntu 20.04](https://ubuntu.com/download/):
+
+```bash
+sudo apt-get update && sudo apt-get install -y \
+    docker-compose \
+    docker.io \
+    && apt-get clean
+
+sudo usermod -aG docker $USER
+```
+
+Build and run the dev environment by entering the following commands:
+
+```bash
+cd ./banana/
+docker-compose build
+docker-compose run banana
+```
