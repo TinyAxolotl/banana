@@ -34,8 +34,9 @@ def periodical_script():
 
     logging.info(args)
 
-    if args.eso_live_path[:2] == "~/":
-        args.eso_live_path = Path.home().joinpath(args.eso_live_path[2:])
+    if isinstance(args.eso_live_path, str):
+        if args.eso_live_path[:2] == "~/":
+            args.eso_live_path = Path.home().joinpath(args.eso_live_path[2:])
 
     config_path = Path(args.eso_live_path).joinpath("addons.yaml")
     config_path.touch(exist_ok=True)
