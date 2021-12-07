@@ -5,4 +5,4 @@ services:
     image: banana
     build:
       context: .
-    command: banana-script
+    command: eso-banana-script

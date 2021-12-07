@@ -14,7 +14,7 @@ def new(path: Path):
 
 def load(path: Path) -> dict:
     with path.open("r") as file_open:
-        config = yaml.load(file_open)
+        config = yaml.safe_load(file_open)
 
     return config
 
