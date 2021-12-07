@@ -6,14 +6,15 @@ build-backend = "poetry.masonry.api"
 authors = ["py <py@py>"]
 description = ""
 license = "MIT"
-name = "banana"
+name = "eso-banana"
 version = "0.0.1"
 
 [[tool.poetry.packages]]
 include = "banana"
 
 [tool.poetry.scripts]
-banana-script = "banana:scripts.periodical_script"
+eso-banana-script = "banana:scripts.periodical_script"
 
 [tool.poetry.dependencies]
 requests = ""
+PyYAML = ""
