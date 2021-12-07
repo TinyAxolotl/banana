@@ -5,4 +5,7 @@ services:
     image: banana
     build:
       context: .
-    command: eso-banana-script
+    volumes:
+      - .:/project
+    working_dir: /project
+    command: eso-banana-script -v
