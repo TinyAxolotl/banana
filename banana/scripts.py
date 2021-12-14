@@ -7,6 +7,38 @@ from argparse import ArgumentParser
 from . import config
 
 
+def esoui_parse(addon_urls: list):
+    esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
+    esoui_names = list()
+
+    for url in addon_urls:
+        addon = esoui_prefix.split(url)[1]
+        addon = addon.split(".html")[0]
+        esoui_names.append(addon)
+
+    logging.info(esoui_names)
+
+    esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
+    esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
+    esoui_versions = list()
+
+    for url in addon_urls:
+        response = requests.get(url)
+        version_line = esoui_version_html.search(response.text)
+        version = esoui_version_split.split(version_line.group(0))[1]
+        esoui_versions.append(version)
+
+    esoui_dowload_uris = list()
+
+    for url in addon_urls:
+        esoui_dowload_uri = url.replace("info", "download")
+        response = requests.head(esoui_dowload_uri)
+        response.raise_for_status()
+        esoui_dowload_uris.append(esoui_dowload_uri)
+
+    return esoui_names, esoui_versions, esoui_dowload_uris
+
+
 def periodical_script():
     parser = ArgumentParser(
         description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
@@ -50,24 +82,6 @@ def periodical_script():
         config_current = config.load(config_path)
         logging.info(f'addons list created at "{config_path}"')
 
-    esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
-    esoui_names = list()
-
-    for url in config_current.get("addons"):
-        addon = esoui_prefix.split(url)[1]
-        addon = addon.split(".html")[0]
-        esoui_names.append(addon)
-
-    logging.info(esoui_names)
-
-    esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
-    esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
-    esoui_versions = list()
-
-    for url in config_current.get("addons"):
-        response = requests.get(url)
-        version_line = esoui_version_html.search(response.text)
-        version = esoui_version_split.split(version_line.group(0))[1]
-        esoui_versions.append(version)
-
-    logging.info(esoui_versions)
+    addon_urls = config_current.get("addons")
+    esoui = esoui_parse(addon_urls)
+    logging.info(esoui)
