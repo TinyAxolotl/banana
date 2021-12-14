@@ -1,42 +1,9 @@
-import requests
-import re
 import logging
 from pathlib import Path
 from argparse import ArgumentParser
 
 from . import config
-
-
-def esoui_parse(addon_urls: list):
-    esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
-    esoui_names = list()
-
-    for url in addon_urls:
-        addon = esoui_prefix.split(url)[1]
-        addon = addon.split(".html")[0]
-        esoui_names.append(addon)
-
-    logging.info(esoui_names)
-
-    esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
-    esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
-    esoui_versions = list()
-
-    for url in addon_urls:
-        response = requests.get(url)
-        version_line = esoui_version_html.search(response.text)
-        version = esoui_version_split.split(version_line.group(0))[1]
-        esoui_versions.append(version)
-
-    esoui_dowload_uris = list()
-
-    for url in addon_urls:
-        esoui_dowload_uri = url.replace("info", "download")
-        response = requests.head(esoui_dowload_uri)
-        response.raise_for_status()
-        esoui_dowload_uris.append(esoui_dowload_uri)
-
-    return esoui_names, esoui_versions, esoui_dowload_uris
+from . import parsing
 
 
 def periodical_script():
@@ -83,5 +50,7 @@ def periodical_script():
         logging.info(f'addons list created at "{config_path}"')
 
     addon_urls = config_current.get("addons")
-    esoui = esoui_parse(addon_urls)
-    logging.info(esoui)
+
+    for url in addon_urls:
+        esoui = parsing.esoui(url)
+        logging.info(esoui)
