@@ -1,7 +1,8 @@
-from argparse import ArgumentParser
-import logging
 import requests
+import re
+import logging
 from pathlib import Path
+from argparse import ArgumentParser
 
 from . import config
 
@@ -44,7 +45,29 @@ def periodical_script():
 
     try:
         config.valid(config_current)
-    except AssertionError:
+    except (AssertionError, AttributeError):
         config.new(config_path)
         config_current = config.load(config_path)
         logging.info(f'addons list created at "{config_path}"')
+
+    esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
+    addon_names = list()
+
+    for url in config_current.get("addons"):
+        addon = esoui_prefix.split(url)[1]
+        addon = addon.split(".html")[0]
+        addon_names.append(addon)
+
+    logging.info(addon_names)
+
+    version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
+    version_split = re.compile('<div\s+id="version">Version:\s+')
+    addon_versions = list()
+
+    for url in config_current.get("addons"):
+        response = requests.get(url)
+        version_line = version_html.search(response.text)
+        version = version_split.split(version_line.group(0))[1]
+        addon_versions.append(version)
+
+    logging.info(addon_versions)

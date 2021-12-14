@@ -3,7 +3,13 @@ from pathlib import Path
 
 
 def new(path: Path):
-    config = {"addons": ["https://www.esoui.com/downloads/info7-LibAddonMenu.html"]}
+    config = {
+        "addons": [
+            "https://www.esoui.com/downloads/info7-LibAddonMenu.html",
+            "https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html",
+            "https://www.esoui.com/downloads/info1146-LibCustomMenu.html",
+        ]
+    }
 
     with path.open("w") as file_open:
         config = yaml.dump(config, file_open, default_flow_style=False)

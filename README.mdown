@@ -1,8 +1,18 @@
 # Elder Scrolls Online Commadline Addon Manager
 
-Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater
+Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater.
 
 [MIT License](LICENSE)
+
+It is recommended that you back up your ESO live profile before using `banana` in case you want to revert back.
+
+On Windows, press `Windows Key + e` to open a file explorer and enter the following path in the address bar:
+
+```
+%HOME%\Documents\Elder Scrolls Online\
+```
+
+Make a copy of the `live` folder and rename it to something meaningful like `old` or `backup`.
 
 # Dependencies
 
