@@ -8,6 +8,6 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean
 
 COPY ./banana/ /app/banana/
-COPY pyproject.toml /app/
+COPY setup.py /app/
 WORKDIR /app/
 RUN pip3 install --no-deps .
