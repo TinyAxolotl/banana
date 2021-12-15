@@ -1,7 +1,8 @@
-import logging
-from pathlib import Path
 from argparse import ArgumentParser
+from pathlib import Path
+import logging
 
+from . import compare
 from . import config
 from . import parsing
 
@@ -49,18 +50,18 @@ def periodical_script():
         config_current = config.load(config_path)
         logging.info(f'addons list created at "{config_path}"')
 
-    addon_urls = config_current.get("addons")
-
-    for url in addon_urls:
-        esoui = parsing.esoui(url)
-        logging.info(esoui)
-
     live_path = Path(args.eso_live_path).joinpath("AddOns")
 
     if not live_path.is_dir():
         logging.error(f"eso_live_path_invalid_dir {live_path}")
         return
 
+    addon_urls = config_current.get("addons")
+    esoui_uris = list()
+
+    for url in addon_urls:
+        esoui = parsing.esoui(url)
+        esoui_uris.append(esoui)
+
     for child in live_path.iterdir():
-        live_addon = parsing.live_addon(child)
-        logging.info(live_addon)
+        compare.live_to_esoui(path=child, esoui_uris=esoui_uris)

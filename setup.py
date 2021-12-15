@@ -8,5 +8,9 @@ setup(
         "console_scripts": ["eso-banana-script = banana:scripts.periodical_script"],
     },
     python_requires=">3",
-    install_requires=["requests", "PyYAML"],
+    install_requires=[
+        "packaging",
+        "PyYAML",
+        "requests",
+    ],
 )

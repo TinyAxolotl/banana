@@ -16,5 +16,6 @@ include = "banana"
 eso-banana-script = "banana:scripts.periodical_script"
 
 [tool.poetry.dependencies]
-requests = ""
+packaging = ""
 PyYAML = ""
+requests = ""
