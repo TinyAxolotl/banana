@@ -54,3 +54,13 @@ def periodical_script():
     for url in addon_urls:
         esoui = parsing.esoui(url)
         logging.info(esoui)
+
+    live_path = Path(args.eso_live_path).joinpath("AddOns")
+
+    if not live_path.is_dir():
+        logging.error(f"eso_live_path_invalid_dir {live_path}")
+        return
+
+    for child in live_path.iterdir():
+        live_addon = parsing.live_addon(child)
+        logging.info(live_addon)
