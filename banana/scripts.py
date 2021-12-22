@@ -65,3 +65,5 @@ def periodical_script():
 
     for child in live_path.iterdir():
         compare.live_to_esoui(path=child, esoui_uris=esoui_uris)
+
+    compare.esoui_to_live(esoui_uris=esoui_uris, live_path=live_path)

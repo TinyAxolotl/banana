@@ -48,3 +48,26 @@ def live_to_esoui(*, path: Path, esoui_uris: list):
     logging.info(
         f"{live_name} updated from {live_version} to {esoui_version} at {live_path}"
     )
+
+
+def esoui_to_live(*, esoui_uris: list, live_path: Path):
+    for addon_name, version, esoui_dowload_uri in esoui_uris:
+        if addon_name in list(live_path.iterdir()):
+            logging.info(f"{addon_name} already installed.")
+            continue
+
+        response = requests.get(esoui_dowload_uri)
+        response.raise_for_status()
+
+        temp_dir = TemporaryDirectory()
+        temp_path = Path(temp_dir.name)
+
+        zip_file = ZipFile(BytesIO(response.content))
+        zip_file.extractall(temp_path)
+
+        live_dest = live_path.joinpath(each.name)
+
+        for each in temp_path.iterdir():
+            copytree(each, live_dest)
+
+        logging.info(f"{addon_name} installed {version} at {live_dest}")
