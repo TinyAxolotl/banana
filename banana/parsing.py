@@ -1,3 +1,4 @@
+from packaging import version
 from pathlib import Path
 import logging
 import re
@@ -7,8 +8,6 @@ esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
 esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
 esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
 esoui_download = re.compile('https://cdn.esoui.com/downloads/file[^"]*')
-live_title = re.compile("##\s+Title:\s+.*")
-live_title_split = re.compile("##\s+Title:\s+")
 live_version = re.compile("##\s+Version:\s+.*")
 live_version_split = re.compile("##\s+Version:\s+")
 
@@ -21,7 +20,8 @@ def esoui(url: str):
     response.raise_for_status()
 
     version_line = esoui_version_html.search(response.text).group(0)
-    version = esoui_version_split.split(version_line)[1]
+    _version = esoui_version_split.split(version_line)[1]
+    _version = version.parse(_version)
 
     esoui_page_url = url.replace("info", "download").replace(".html", "")
 
@@ -32,24 +32,32 @@ def esoui(url: str):
     response = requests.head(esoui_dowload_uri)
     response.raise_for_status()
 
-    return addon_name, version, esoui_dowload_uri
+    return addon_name, _version, esoui_dowload_uri
 
 
 def live(path: Path):
-    for meta in path.glob("*.txt"):
+    meta_file = path.joinpath(f"{path.stem}.txt")
 
-        try:
-            with meta.open("r") as file_open:
-                meta_data = file_open.read()
-        except UnicodeDecodeError:
-            with meta.open("r", encoding="latin-1") as file_open:
-                meta_data = file_open.read()
+    if not meta_file.is_file():
+        for meta_file in path.glob("*.txt"):
+            if not meta_file.stem in path.stem:
+                continue
 
-        addon_name = live_title.search(meta_data).group(0)
-        addon_name = live_title_split.split(addon_name)[1]
-        version = live_version.search(meta_data).group(0)
-        version = live_version_split.split(version)[1]
+    try:
+        with meta_file.open("r") as file_open:
+            meta_data = file_open.read()
+    except UnicodeDecodeError:
+        with meta_file.open("r", encoding="latin-1") as file_open:
+            meta_data = file_open.read()
 
-        return addon_name, version, path
+    addon_name = meta_file.stem
+    result = live_version.search(meta_data)
 
-    return None, None, None
+    if result:
+        _version = result.group(0)
+        _version = live_version_split.split(_version)[1]
+        _version = version.parse(_version)
+    else:
+        _version = version.parse("0")
+
+    return addon_name, _version, path

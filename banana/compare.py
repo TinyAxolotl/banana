@@ -17,9 +17,13 @@ def live_to_esoui(*, path: Path, esoui_uris: list):
 
     esoui_name, esoui_version, esoui_uri = None, None, None
 
-    for name, version, uri in esoui_uris:
-        if name in live_name:
-            esoui_name, esoui_version, esoui_uri = name, version, uri
+    for _name, _version, _uri in esoui_uris:
+        if _name in live_name:
+            esoui_name, esoui_version, esoui_uri = _name, _version, _uri
+            break
+
+        if live_name in _name:
+            esoui_name, esoui_version, esoui_uri = _name, _version, _uri
             break
 
     if not esoui_name:
@@ -51,9 +55,20 @@ def live_to_esoui(*, path: Path, esoui_uris: list):
 
 
 def esoui_to_live(*, esoui_uris: list, live_path: Path):
-    for addon_name, version, esoui_dowload_uri in esoui_uris:
-        if addon_name in list(live_path.iterdir()):
-            logging.info(f"{addon_name} already installed.")
+    for addon_name, addon_version, esoui_dowload_uri in esoui_uris:
+        match = None
+
+        for each in live_path.iterdir():
+            if addon_name in each.name:
+                match = each
+                break
+
+            if each.name in addon_name:
+                match = each
+                break
+
+        if match:
+            logging.debug(f"{addon_name} already installed.")
             continue
 
         response = requests.get(esoui_dowload_uri)
@@ -65,9 +80,12 @@ def esoui_to_live(*, esoui_uris: list, live_path: Path):
         zip_file = ZipFile(BytesIO(response.content))
         zip_file.extractall(temp_path)
 
-        live_dest = live_path.joinpath(each.name)
-
         for each in temp_path.iterdir():
+            live_dest = live_path.joinpath(each.name)
+
+            if live_dest.exists():
+                continue
+
             copytree(each, live_dest)
 
-        logging.info(f"{addon_name} installed {version} at {live_dest}")
+        logging.info(f"{addon_name} installed {addon_version} at {live_dest}")
