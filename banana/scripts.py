@@ -5,6 +5,7 @@ import logging
 from . import compare
 from . import config
 from . import parsing
+from . import tamriel_trade_centre
 
 
 def periodical_script():
@@ -67,3 +68,4 @@ def periodical_script():
         compare.live_to_esoui(path=child, esoui_uris=esoui_uris)
 
     compare.esoui_to_live(esoui_uris=esoui_uris, live_path=live_path)
+    tamriel_trade_centre.update(live_path=live_path)

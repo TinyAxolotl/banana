@@ -36,9 +36,13 @@ def esoui(url: str):
 
 
 def live(path: Path):
+    if not path.is_dir():
+        logging.error(f"unexpected file object {path}, ignoring")
+        return
+
     meta_file = path.joinpath(f"{path.stem}.txt")
 
-    if not meta_file.is_file():
+    if not meta_file.exists():
         for meta_file in path.glob("*.txt"):
             if not meta_file.stem in path.stem:
                 continue
