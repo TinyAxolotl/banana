@@ -47,3 +47,7 @@ cd ./banana/
 docker-compose build
 docker-compose run banana
 ```
+
+# Notes
+
+- https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/new-scheduledtaskaction
