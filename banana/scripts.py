@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from pathlib import Path
+from platform import system
 import logging
 
 from . import compare
@@ -13,18 +14,26 @@ def periodical_script():
         description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
     )
     parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
-    parser.add_argument(
-        "-p",
-        "--eso_live_path",
-        default=Path.home().joinpath("ESO/live/"),
-        help='default: "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"',
-    )
+    parser.add_argument("-p", "--eso_live_path")
     args = parser.parse_args()
+
+    if args.eso_live_path:
+        args.eso_live_path = Path(args.eso_live_path)
+    else:
+        if system() == "Windows":
+            args.eso_live_path = Path.home().joinpath(
+                "Documents\Elder Scrolls Online\live"
+            )
+        else:
+            args.eso_live_path = Path.home().joinpath(
+                ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
+            )
 
     if args.verbose:
         logging.basicConfig(
             level=logging.DEBUG,
             format="%(asctime)s %(filename)s:%(lineno)d %(message)s",
+            filename=args.eso_live_path.joinpath("banana.log"),
         )
     else:
         logging.basicConfig(
@@ -33,10 +42,6 @@ def periodical_script():
         )
 
     logging.info(args)
-
-    if isinstance(args.eso_live_path, str):
-        if args.eso_live_path[:2] == "~/":
-            args.eso_live_path = Path.home().joinpath(args.eso_live_path[2:])
 
     config_path = Path(args.eso_live_path).joinpath("addons.yaml")
     config_path.touch(exist_ok=True)
@@ -49,7 +54,7 @@ def periodical_script():
         config_current = config.load(config_path)
         logging.info(f'addons list created at "{config_path}"')
 
-    live_path = Path(args.eso_live_path).joinpath("AddOns")
+    live_path = args.eso_live_path.joinpath("AddOns")
 
     if not live_path.is_dir():
         logging.error(f"eso_live_path_invalid_dir {live_path}")
@@ -70,24 +75,28 @@ def periodical_script():
 
 
 def ttc():
-    parser = ArgumentParser(
-        description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
-    )
+    parser = ArgumentParser(description="Tamriel Trade Centre price table updater.")
     parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
-    parser.add_argument(
-        "-p",
-        "--eso_live_path",
-        default=Path.home().joinpath(
-            ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
-        ),
-        help='default: "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"',
-    )
+    parser.add_argument("-p", "--eso_live_path")
     args = parser.parse_args()
+
+    if args.eso_live_path:
+        args.eso_live_path = Path(args.eso_live_path)
+    else:
+        if system() == "Windows":
+            args.eso_live_path = Path.home().joinpath(
+                "Documents\Elder Scrolls Online\live"
+            )
+        else:
+            args.eso_live_path = Path.home().joinpath(
+                ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
+            )
 
     if args.verbose:
         logging.basicConfig(
             level=logging.DEBUG,
             format="%(asctime)s %(filename)s:%(lineno)d %(message)s",
+            filename=args.eso_live_path.joinpath("banana.log"),
         )
     else:
         logging.basicConfig(
@@ -96,10 +105,6 @@ def ttc():
         )
 
     logging.info(args)
-
-    if isinstance(args.eso_live_path, str):
-        if args.eso_live_path[:2] == "~/":
-            args.eso_live_path = Path.home().joinpath(args.eso_live_path[2:])
 
     live_path = Path(args.eso_live_path).joinpath("AddOns")
 
