@@ -76,7 +76,12 @@ eso-banana-script
 
 ## Linux Scheduled
 
-TODO linux chron job instructions.
+Linux command scheduling can be performed with the [crontab](https://help.ubuntu.com/community/CronHowto) command:
+
+```bash
+crontab -e
+0 11 * * * eso-banana-script --verbose
+```
 
 # Development
 
