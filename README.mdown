@@ -68,7 +68,8 @@ eso-banana-script.exe
 To schedule a periodic background run of `eso-banana`, open Powershell as a user and enter the following commands.
 
 ```powershell
-$Action = New-ScheduledTaskAction -Execute "eso-banana-script.exe" -Argument "--verbose"
+$Command = (Get-Command "eso-banana-script.exe").Source
+$Action = New-ScheduledTaskAction -Execute $Command -Argument "--verbose"
 $Trigger = New-ScheduledTaskTrigger -Daily -At 11am
 $Settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -StartWhenAvailable -RunOnlyIfIdle
 Register-ScheduledTask -TaskName "eso-banana" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
@@ -103,7 +104,3 @@ cd ./banana/
 docker-compose build
 docker-compose run banana
 ```
-
-# Notes
-
-- https://docs.microsoft.com/en-us/powershell/module/scheduledtasks/new-scheduledtaskaction
