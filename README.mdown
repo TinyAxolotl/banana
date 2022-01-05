@@ -57,6 +57,17 @@ TaskPath                                TaskName                          State
 --------                                --------                          -----
 \                                       eso-banana                        Ready
 ```
+# Windows Unschedule
+
+Only run the following command if you wish to remove scheduled run of `eso-banana`.
+
+To remove the schedule, use the `Unregister-ScheduledTask` command:
+
+```
+Unregister-ScheduledTask eso-banana
+```
+
+Press enter to confirm removal.
 
 # Linux Installation
 
@@ -80,5 +91,19 @@ Linux command scheduling can be performed with the [crontab](https://help.ubuntu
 
 ```bash
 crontab -e
+```
+
+Add the following line to your `crontab`.
+
+```
+0 11 * * * eso-banana-script --verbose
+```
+# Linux Unschedule
+
+Only run the following command if you wish to remove scheduled run of `eso-banana`.
+
+To remove the schedule, delete the following line from your `crontab -e`.
+
+```
 0 11 * * * eso-banana-script --verbose
 ```
