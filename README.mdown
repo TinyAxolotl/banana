@@ -64,6 +64,7 @@ Install `python3` and `pip3`, the following instructions are for Debian.
 
 ```
 sudo apt install python3-pip
+cd ./eso-banana/
 pip3 install .
 ```
 
