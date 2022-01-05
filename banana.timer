@@ -1,9 +1,0 @@
-[Unit]
-Description=Run eso-banana addon management once a day.
-
-[Timer]
-OnUnitActiveSec=12h
-Unit=banana.service
-
-[Install]
-WantedBy=multi-user.target

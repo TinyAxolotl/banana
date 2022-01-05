@@ -1,9 +1,0 @@
-[Unit]
-Description=run eso-banana addon management
-
-[Service]
-Type=simple
-ExecStart=banana-script
-
-[Install]
-WantedBy=default.target
