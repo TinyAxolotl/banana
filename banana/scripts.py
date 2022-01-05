@@ -16,9 +16,7 @@ def periodical_script():
     parser.add_argument(
         "-p",
         "--eso_live_path",
-        default=Path.home().joinpath(
-            ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
-        ),
+        default=Path.home().joinpath("ESO/live/"),
         help='default: "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"',
     )
     args = parser.parse_args()
@@ -68,4 +66,45 @@ def periodical_script():
         compare.live_to_esoui(path=child, esoui_uris=esoui_uris)
 
     compare.esoui_to_live(esoui_uris=esoui_uris, live_path=live_path)
+    tamriel_trade_centre.update(live_path=live_path)
+
+
+def ttc():
+    parser = ArgumentParser(
+        description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
+    )
+    parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
+    parser.add_argument(
+        "-p",
+        "--eso_live_path",
+        default=Path.home().joinpath(
+            ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
+        ),
+        help='default: "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"',
+    )
+    args = parser.parse_args()
+
+    if args.verbose:
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format="%(asctime)s %(filename)s:%(lineno)d %(message)s",
+        )
+    else:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(message)s",
+        )
+
+    logging.info(args)
+
+    if isinstance(args.eso_live_path, str):
+        if args.eso_live_path[:2] == "~/":
+            args.eso_live_path = Path.home().joinpath(args.eso_live_path[2:])
+
+    live_path = Path(args.eso_live_path).joinpath("AddOns")
+
+    if not live_path.is_dir():
+        logging.error(f"eso_live_path_invalid_dir {live_path}")
+        return
+
     tamriel_trade_centre.update(live_path=live_path)

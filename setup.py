@@ -5,7 +5,10 @@ setup(
     version="0.0.1",
     packages=["banana"],
     entry_points={
-        "console_scripts": ["eso-banana-script = banana:scripts.periodical_script"],
+        "console_scripts": [
+            "eso-banana-script = banana:scripts.periodical_script",
+            "eso-ttc = banana:scripts.ttc",
+        ],
     },
     python_requires=">3",
     install_requires=[
