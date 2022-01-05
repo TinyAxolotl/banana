@@ -20,10 +20,42 @@ Documents\Elder Scrolls Online\
 
 Make a copy of the `live` folder and rename it to something meaningful like `old` or `backup`.
 
-# Dependencies
+# Windows Installation
+
+Install the latest Python 3 using the installer provided by [python.org](https://www.python.org/downloads/windows/).
+
+Open [Windows Terminal](https://www.microsoft.com/en-US/p/windows-terminal/9n0dx20hk701) or any windows command prompt and navigate to this project.
+Use the Python package manager PIP to install `eso-banana`.
+
+```powershell
+cd .\eso-banana\
+pip install .
+```
+
+Once the project is installed to python's packages you may invoke the addon script with the following command:
+
+```powershell
+eso-banana-script.exe
+```
+
+# Windows Scheduled
+
+To schedule a periodic background run of `eso-banana`, open Powershell as a user and enter the following commands.
+
+```powershell
+$Command = (Get-Command "eso-banana-script.exe").Source
+$Action = New-ScheduledTaskAction -Execute $Command -Argument "--verbose"
+$Trigger = New-ScheduledTaskTrigger -Daily -At 11am
+$Settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -StartWhenAvailable -RunOnlyIfIdle
+Register-ScheduledTask -TaskName "eso-banana" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
+```
+
+To check to make sure the task is registered correctly, enter `Get-ScheduledTask` and check that the first entry looks similar:
 
 ```
-python3-pip
+TaskPath                                TaskName                          State
+--------                                --------                          -----
+\                                       eso-banana                        Ready
 ```
 
 # Linux Installation
@@ -44,44 +76,6 @@ eso-banana-script
 ## Linux Scheduled
 
 TODO linux chron job instructions.
-
-# Windows Installation
-
-Install the latest Python 3 using the installer provided by [python.org](https://www.python.org/downloads/windows/).
-
-Open [Windows Terminal](https://www.microsoft.com/en-US/p/windows-terminal/9n0dx20hk701) or any windows command prompt and navigate to this project.
-Use the Python package manager PIP to install `eso-banana`.
-
-```powershell
-cd .\eso-banana\
-pip install .
-```
-
-Once the project is installed to python's packages you may invoke the addon script with the following command:
-
-```powershell
-eso-banana-script.exe
-```
-
-## Windows Scheduled
-
-To schedule a periodic background run of `eso-banana`, open Powershell as a user and enter the following commands.
-
-```powershell
-$Command = (Get-Command "eso-banana-script.exe").Source
-$Action = New-ScheduledTaskAction -Execute $Command -Argument "--verbose"
-$Trigger = New-ScheduledTaskTrigger -Daily -At 11am
-$Settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -StartWhenAvailable -RunOnlyIfIdle
-Register-ScheduledTask -TaskName "eso-banana" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
-```
-
-To check to make sure the task is registered correctly, enter `Get-ScheduledTask` and check that the first entry looks similar:
-
-```
-TaskPath                                TaskName                          State
---------                                --------                          -----
-\                                       eso-banana                        Ready
-```
 
 # Development
 
