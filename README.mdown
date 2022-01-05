@@ -85,7 +85,7 @@ Once the project is installed to python's packages you may invoke the addon scri
 eso-banana-script
 ```
 
-## Linux Scheduled
+# Linux Scheduled
 
 Linux command scheduling can be performed with the [crontab](https://help.ubuntu.com/community/CronHowto) command:
 
