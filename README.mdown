@@ -20,6 +20,26 @@ Documents\Elder Scrolls Online\
 
 Make a copy of the `live` folder and rename it to something meaningful like `old` or `backup`.
 
+# Usage
+
+Follow the installation instructions for your `platform`:
+
+- [Windows](#windows-installation)
+- [Linux](#linux-installation)
+
+On first run, the `addons.yaml` file will be created in your ESO live directory.
+It will look similar to the following:
+
+```yaml
+addons:
+- https://www.esoui.com/downloads/info7-LibAddonMenu.html
+- https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
+- https://www.esoui.com/downloads/info1146-LibCustomMenu.html
+```
+
+Add the ESOUI url for each additional addon you wish to keep updated.
+Make sure to prefix each URL line with a dash and a space (`- `).
+
 # Windows Installation
 
 Install the latest Python 3 using the installer provided by [python.org](https://www.python.org/downloads/windows/).
@@ -37,8 +57,6 @@ Once the project is installed to python's packages you may invoke the addon scri
 ```powershell
 eso-banana-script.exe
 ```
-
-# Windows Scheduled
 
 To schedule a periodic background run of `eso-banana`, open Powershell as a user and enter the following commands.
 
@@ -85,9 +103,7 @@ Once the project is installed to python's packages you may invoke the addon scri
 eso-banana-script
 ```
 
-# Linux Scheduled
-
-Linux command scheduling can be performed with the [crontab](https://help.ubuntu.com/community/CronHowto) command:
+To schedule a periodic background run of `eso-banana` can be performed with the [crontab](https://help.ubuntu.com/community/CronHowto) command:
 
 ```bash
 crontab -e
