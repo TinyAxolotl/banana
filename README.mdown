@@ -43,6 +43,7 @@ Make sure to prefix each URL line with a dash and a space (`- `).
 # Windows Installation
 
 Install the latest Python 3 using the installer provided by [python.org](https://www.python.org/downloads/windows/).
+When the python installer asks, [add python to PATH](https://docs.python.org/3/using/windows.html#installation-steps).
 
 Open [Windows Terminal](https://www.microsoft.com/en-US/p/windows-terminal/9n0dx20hk701) or any windows command prompt and navigate to this project.
 Use the Python package manager PIP to install `eso-banana`.
