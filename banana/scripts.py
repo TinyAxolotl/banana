@@ -14,6 +14,7 @@ def periodical_script():
         description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
     )
     parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
+    parser.add_argument("-l", "--log")
     parser.add_argument("-p", "--eso_live_path")
     args = parser.parse_args()
 
@@ -30,15 +31,22 @@ def periodical_script():
             )
 
     if args.verbose:
+        level = logging.DEBUG
+        format = "%(asctime)s %(filename)s:%(lineno)d %(message)s"
+    else:
+        level = logging.INFO
+        format = "%(message)s"
+
+    if args.log:
         logging.basicConfig(
-            level=logging.DEBUG,
-            format="%(asctime)s %(filename)s:%(lineno)d %(message)s",
+            level=level,
+            format=format,
             filename=args.eso_live_path.joinpath("banana.log"),
         )
     else:
         logging.basicConfig(
-            level=logging.INFO,
-            format="%(message)s",
+            level=level,
+            format=format,
         )
 
     logging.info(args)
@@ -77,6 +85,7 @@ def periodical_script():
 def ttc():
     parser = ArgumentParser(description="Tamriel Trade Centre price table updater.")
     parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
+    parser.add_argument("-l", "--log")
     parser.add_argument("-p", "--eso_live_path")
     args = parser.parse_args()
 
@@ -93,15 +102,22 @@ def ttc():
             )
 
     if args.verbose:
+        level = logging.DEBUG
+        format = "%(asctime)s %(filename)s:%(lineno)d %(message)s"
+    else:
+        level = logging.INFO
+        format = "%(message)s"
+
+    if args.log:
         logging.basicConfig(
-            level=logging.DEBUG,
-            format="%(asctime)s %(filename)s:%(lineno)d %(message)s",
+            level=level,
+            format=format,
             filename=args.eso_live_path.joinpath("banana.log"),
         )
     else:
         logging.basicConfig(
-            level=logging.INFO,
-            format="%(message)s",
+            level=level,
+            format=format,
         )
 
     logging.info(args)

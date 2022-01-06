@@ -63,7 +63,7 @@ To schedule a periodic background run of `eso-banana`, open Powershell as a user
 
 ```powershell
 $Command = (Get-Command "eso-banana-script.exe").Source
-$Action = New-ScheduledTaskAction -Execute $Command -Argument "--verbose"
+$Action = New-ScheduledTaskAction -Execute $Command -Argument "--log"
 $Trigger = New-ScheduledTaskTrigger -Daily -At 11am
 $Settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -StartWhenAvailable -RunOnlyIfIdle
 Register-ScheduledTask -TaskName "eso-banana" -Action $Action -Trigger $Trigger -Settings $Settings -Description "Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
@@ -113,7 +113,7 @@ crontab -e
 Add the following line to your `crontab`.
 
 ```
-0 11 * * * eso-banana-script --verbose
+0 11 * * * eso-banana-script --log
 ```
 # Linux Unschedule
 
@@ -122,5 +122,5 @@ Only run the following command if you wish to remove scheduled run of `eso-banan
 To remove the schedule, delete the following line from your `crontab -e`.
 
 ```
-0 11 * * * eso-banana-script --verbose
+0 11 * * * eso-banana-script --log
 ```
