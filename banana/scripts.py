@@ -35,7 +35,7 @@ def periodical_script():
         format = "%(asctime)s %(filename)s:%(lineno)d %(message)s"
     else:
         level = logging.INFO
-        format = "%(message)s"
+        format = "%(asctime)s %(message)s"
 
     if args.log:
         logging.basicConfig(
@@ -106,7 +106,7 @@ def ttc():
         format = "%(asctime)s %(filename)s:%(lineno)d %(message)s"
     else:
         level = logging.INFO
-        format = "%(message)s"
+        format = "%(asctime)s %(message)s"
 
     if args.log:
         logging.basicConfig(
