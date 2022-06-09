@@ -1,6 +1,4 @@
 from argparse import ArgumentParser
-from distutils.dir_util import copy_tree
-from packaging import version
 from pathlib import Path
 from platform import system
 from shutil import rmtree, copytree, copyfileobj
@@ -116,10 +114,8 @@ def esoui_parse(url: str):
 
     # writworthy has some garbage characters on it's page
     response_text = response_data[:110000].decode("unicode_escape")
-
     version_line = esoui_version_html.search(response_text).group(0)
-    _version = esoui_version_split.split(version_line)[1]
-    _version = version.parse(_version)
+    version = esoui_version_split.split(version_line)[1]
 
     esoui_page_url = url.replace("info", "download").replace(".html", "")
 
@@ -135,7 +131,7 @@ def esoui_parse(url: str):
     response = urlopen(head_request)
     response_text = response.read().decode("unicode_escape")
 
-    return addon_name, _version, esoui_dowload_uri
+    return addon_name, version, esoui_dowload_uri
 
 
 def live_parse(path: Path):
@@ -160,14 +156,13 @@ def live_parse(path: Path):
     addon_name = meta_file.stem
     result = live_version.search(meta_data)
 
-    if result:
-        _version = result.group(0)
-        _version = live_version_split.split(_version)[1]
-        _version = version.parse(_version)
-    else:
-        _version = version.parse("0")
+    version = "0"
 
-    return addon_name, _version, path
+    if result:
+        version = result.group(0)
+        version = live_version_split.split(version)[1]
+
+    return addon_name, version, path
 
 
 config_template = """https://www.esoui.com/downloads/info7-LibAddonMenu.html
@@ -314,7 +309,7 @@ def ttc_update(live_path: Path):
     zip_file.extractall(temp_path)
 
     live_tamriel_trade_centre = live_path.joinpath("TamrielTradeCentre")
-    copy_tree(str(temp_path.absolute()), str(live_tamriel_trade_centre.absolute()))
+    copytree(temp_path, live_tamriel_trade_centre, dirs_exist_ok=True)
 
     logging.info(
         f"tamriel trade centre price table updated: {live_tamriel_trade_centre}"
