@@ -7,6 +7,7 @@ from shutil import rmtree, copytree, copyfileobj
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from zipfile import ZipFile
 from urllib.request import Request, urlopen
+from urllib.parse import quote
 import logging
 import re
 
@@ -111,7 +112,11 @@ def esoui_parse(url: str):
 
     request = Request(url, headers=HEADERS)
     response = urlopen(request)
-    response_text = response.read().decode("unicode_escape")
+    response_data = response.read()
+
+    # writworthy has some garbage characters on it's page
+    response_text = response_data[:110000].decode("unicode_escape")
+
     version_line = esoui_version_html.search(response_text).group(0)
     _version = esoui_version_split.split(version_line)[1]
     _version = version.parse(_version)
@@ -122,6 +127,10 @@ def esoui_parse(url: str):
     response = urlopen(request)
     response_text = response.read().decode("unicode_escape")
     esoui_dowload_uri = esoui_download.search(response_text).group(0)
+    esoui_dowload_uri = esoui_dowload_uri.split("?")[0]
+    esoui_dowload_uri = esoui_dowload_uri.split("https://")[1]
+    esoui_dowload_uri = quote(esoui_dowload_uri)
+    esoui_dowload_uri = f"https://{esoui_dowload_uri}"
     head_request = Request(esoui_dowload_uri, method="HEAD", headers=HEADERS)
     response = urlopen(head_request)
     response_text = response.read().decode("unicode_escape")
