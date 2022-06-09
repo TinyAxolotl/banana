@@ -10,5 +10,5 @@ WantedBy=timers.target
 
 [Service]
 Type=oneshot
-ExecStart=python3 /home/deck/banana.py
+ExecStart=/usr/bin/python3 /home/deck/banana.py
 User=deck
