@@ -7,8 +7,3 @@ Persistent=true
 
 [Install]
 WantedBy=timers.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/python3 /home/deck/banana.py
-User=deck
