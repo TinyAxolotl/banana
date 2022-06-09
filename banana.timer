@@ -1,0 +1,14 @@
+[Unit]
+Description=Run banana daily and on boot.
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+[Service]
+Type=oneshot
+ExecStart=python3 /home/deck/banana.py
+User=deck

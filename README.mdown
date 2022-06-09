@@ -90,37 +90,20 @@ Press enter to confirm removal.
 
 # Linux Installation
 
-Install `python3` and `pip3`, the following instructions are for Debian.
+The following instructions are for any linux system using systemd.
+This include the Steam Deck.
 
 ```
-sudo apt install python3-pip
-cd ./eso-banana/
-pip3 install .
+cp banana.py /home/deck/
+cp banana.timer /etc/systemd/system/
+sudo systemctl enable banana.timer
 ```
 
-Once the project is installed to python's packages you may invoke the addon script with the following command:
-
-```
-eso-banana-script
-```
-
-To schedule a periodic background run of `eso-banana` can be performed with the [crontab](https://help.ubuntu.com/community/CronHowto) command:
-
-```bash
-crontab -e
-```
-
-Add the following line to your `crontab`.
-
-```
-0 11 * * * eso-banana-script --log
-```
 # Linux Unschedule
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
 
-To remove the schedule, delete the following line from your `crontab -e`.
-
 ```
-0 11 * * * eso-banana-script --log
+systemctl list-timers --all
+sudo systemctl disable banana.timer
 ```
