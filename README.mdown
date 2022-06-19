@@ -149,7 +149,7 @@ sudo systemctl enable banana.timer
 sudo systemctl enable banana.service
 ```
 
-# Steam Deck
+# Steam Deck Unschedule
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
 
