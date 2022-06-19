@@ -1,21 +1,30 @@
 from argparse import ArgumentParser
+from io import BytesIO
+from packaging import version
+from pathlib import Path
 from pathlib import Path
 from platform import system
-from shutil import rmtree, copytree, copyfileobj
-from tempfile import TemporaryDirectory, NamedTemporaryFile
+from shutil import rmtree, copytree
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile
-from urllib.request import Request, urlopen
-from urllib.parse import quote
 import logging
 import re
+import requests
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:48.0) Gecko/20100101 Firefox/48.0"
-}
+config_template = """https://www.esoui.com/downloads/info7-LibAddonMenu.html
+https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
+https://www.esoui.com/downloads/info1146-LibCustomMenu.html
+"""
 
+
+def config_new(path: Path):
+    path.touch(exist_ok=True)
+
+    with path.open("w") as file_open:
+        file_open.write(config_template)
 
 def live_to_esoui(*, path: Path, esoui_uris: list):
-    live_name, live_version, live_path = live_parse(path)
+    live_name, live_version, live_path = parsing_live(path)
 
     if not live_path:
         return
@@ -40,13 +49,13 @@ def live_to_esoui(*, path: Path, esoui_uris: list):
         logging.info(f"{live_name} is already up to date.")
         return
 
-    request = Request(esoui_uri, headers=HEADERS)
-    response = urlopen(request)
-    temp_zip = NamedTemporaryFile()
-    copyfileobj(response, temp_zip)
+    response = requests.get(esoui_uri)
+    response.raise_for_status()
+
     temp_dir = TemporaryDirectory()
     temp_path = Path(temp_dir.name)
-    zip_file = ZipFile(temp_zip)
+
+    zip_file = ZipFile(BytesIO(response.content))
     zip_file.extractall(temp_path)
 
     rmtree(live_path)
@@ -76,13 +85,13 @@ def esoui_to_live(*, esoui_uris: list, live_path: Path):
             logging.debug(f"{addon_name} already installed.")
             continue
 
-        request = Request(esoui_dowload_uri, headers=HEADERS)
-        response = urlopen(request)
-        temp_zip = NamedTemporaryFile()
-        copyfileobj(response, temp_zip)
+        response = requests.get(esoui_dowload_uri)
+        response.raise_for_status()
+
         temp_dir = TemporaryDirectory()
         temp_path = Path(temp_dir.name)
-        zip_file = ZipFile(temp_zip)
+
+        zip_file = ZipFile(BytesIO(response.content))
         zip_file.extractall(temp_path)
 
         for each in temp_path.iterdir():
@@ -108,33 +117,26 @@ def esoui_parse(url: str):
     addon_name = esoui_prefix.split(url)[1]
     addon_name = addon_name.split(".html")[0]
 
-    request = Request(url, headers=HEADERS)
-    response = urlopen(request)
-    response_data = response.read()
+    response = requests.get(url)
+    response.raise_for_status()
 
-    # writworthy has some garbage characters on it's page
-    response_text = response_data[:110000].decode("unicode_escape")
-    version_line = esoui_version_html.search(response_text).group(0)
-    version = esoui_version_split.split(version_line)[1]
+    version_line = esoui_version_html.search(response.text).group(0)
+    _version = esoui_version_split.split(version_line)[1]
+    _version = version.parse(_version)
 
     esoui_page_url = url.replace("info", "download").replace(".html", "")
 
-    request = Request(esoui_page_url, headers=HEADERS)
-    response = urlopen(request)
-    response_text = response.read().decode("unicode_escape")
-    esoui_dowload_uri = esoui_download.search(response_text).group(0)
-    esoui_dowload_uri = esoui_dowload_uri.split("?")[0]
-    esoui_dowload_uri = esoui_dowload_uri.split("https://")[1]
-    esoui_dowload_uri = quote(esoui_dowload_uri)
-    esoui_dowload_uri = f"https://{esoui_dowload_uri}"
-    head_request = Request(esoui_dowload_uri, method="HEAD", headers=HEADERS)
-    response = urlopen(head_request)
-    response_text = response.read().decode("unicode_escape")
+    response = requests.get(esoui_page_url)
+    response.raise_for_status()
 
-    return addon_name, version, esoui_dowload_uri
+    esoui_dowload_uri = esoui_download.search(response.text).group(0)
+    response = requests.head(esoui_dowload_uri)
+    response.raise_for_status()
+
+    return addon_name, _version, esoui_dowload_uri
 
 
-def live_parse(path: Path):
+def parsing_live(path: Path):
     if not path.is_dir():
         logging.error(f"unexpected file object {path}, ignoring")
         return
@@ -156,31 +158,19 @@ def live_parse(path: Path):
     addon_name = meta_file.stem
     result = live_version.search(meta_data)
 
-    version = "0"
-
     if result:
-        version = result.group(0)
-        version = live_version_split.split(version)[1]
+        _version = result.group(0)
+        _version = live_version_split.split(_version)[1]
+        _version = version.parse(_version)
+    else:
+        _version = version.parse("0")
 
-    return addon_name, version, path
-
-
-config_template = """https://www.esoui.com/downloads/info7-LibAddonMenu.html
-https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
-https://www.esoui.com/downloads/info1146-LibCustomMenu.html
-"""
-
-
-def config_new(path: Path):
-    path.touch(exist_ok=True)
-
-    with path.open("w") as file_open:
-        file_open.write(config_template)
+    return addon_name, _version, path
 
 
 def periodical_script():
     parser = ArgumentParser(
-        description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.text in the ESO live path and add the URL for each addon for installation. "
+        description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
     )
     parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
     parser.add_argument("-l", "--log", action="store_true")
@@ -220,6 +210,7 @@ def periodical_script():
 
     logging.info(args)
 
+
     config_path = Path(args.eso_live_path).joinpath("addons.text")
 
     if not config_path.exists():
@@ -227,7 +218,7 @@ def periodical_script():
         logging.info(f'addons list created at "{config_path}"')
 
     with config_path.open("r") as file_open:
-        config_current = file_open.readlines()
+        config_current = [line.rstrip('\n') for line in file_open]
 
     config_current = filter(None, config_current)
     live_path = args.eso_live_path.joinpath("AddOns")
@@ -299,17 +290,17 @@ price_table_name = "TamrielTradeCentre"
 
 
 def ttc_update(live_path: Path):
-    request = Request(price_table_uri, headers=HEADERS)
-    response = urlopen(request)
-    temp_zip = NamedTemporaryFile()
-    copyfileobj(response, temp_zip)
+    response = requests.get(price_table_uri)
+    response.raise_for_status()
+
     temp_dir = TemporaryDirectory()
     temp_path = Path(temp_dir.name)
-    zip_file = ZipFile(temp_zip)
+
+    zip_file = ZipFile(BytesIO(response.content))
     zip_file.extractall(temp_path)
 
     live_tamriel_trade_centre = live_path.joinpath("TamrielTradeCentre")
-    copytree(temp_path, live_tamriel_trade_centre, dirs_exist_ok=True)
+    copytree(temp_path.absolute(), live_tamriel_trade_centre.absolute(), dirs_exist_ok=True)
 
     logging.info(
         f"tamriel trade centre price table updated: {live_tamriel_trade_centre}"

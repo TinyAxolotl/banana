@@ -10,5 +10,6 @@ setup(
             "eso-ttc = banana:ttc",
         ],
     },
+    install_requires=["packaging", "requests"],
     python_requires=">3",
 )
