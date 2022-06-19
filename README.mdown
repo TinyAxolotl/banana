@@ -30,15 +30,14 @@ Follow the installation instructions for your `platform`:
 On first run, the `addons.text` file will be created in your ESO live directory.
 It will look similar to the following:
 
-```yaml
-addons:
-  - https://www.esoui.com/downloads/info7-LibAddonMenu.html
-  - https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
-  - https://www.esoui.com/downloads/info1146-LibCustomMenu.html
+```
+https://www.esoui.com/downloads/info7-LibAddonMenu.html
+https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
+https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 ```
 
 Add the ESOUI url for each additional addon you wish to keep updated.
-Make sure to prefix each URL line with a dash and a space (`-`).
+Make sure to include the `www.` indicator that ESOUI requires for some stupid reason.
 
 # Windows Installation
 
