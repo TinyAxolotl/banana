@@ -32,13 +32,13 @@ It will look similar to the following:
 
 ```yaml
 addons:
-- https://www.esoui.com/downloads/info7-LibAddonMenu.html
-- https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
-- https://www.esoui.com/downloads/info1146-LibCustomMenu.html
+  - https://www.esoui.com/downloads/info7-LibAddonMenu.html
+  - https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
+  - https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 ```
 
 Add the ESOUI url for each additional addon you wish to keep updated.
-Make sure to prefix each URL line with a dash and a space (`- `).
+Make sure to prefix each URL line with a dash and a space (`-`).
 
 # Windows Installation
 
@@ -49,7 +49,7 @@ Open [Windows Terminal](https://www.microsoft.com/en-US/p/windows-terminal/9n0dx
 Use the Python package manager PIP to install `eso-banana`.
 
 ```powershell
-cd .\eso-banana\
+cd .\banana\
 pip install .
 ```
 
@@ -76,6 +76,7 @@ TaskPath                                TaskName                          State
 --------                                --------                          -----
 \                                       eso-banana                        Ready
 ```
+
 # Windows Unschedule
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
@@ -91,16 +92,64 @@ Press enter to confirm removal.
 # Linux Installation
 
 The following instructions are for any linux system using systemd.
-This include the Steam Deck.
+Using your distros package management system, install python3-pip.
 
 ```
-cp banana.py /home/deck/
+sudo apt install python3-pip
+```
+
+Because systemd is cancer you will need to edit the `banana.service` file to include your user's home path.
+
+```
+[Unit]
+Description=Run banana daily and on boot.
+Wants=banana.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/user_name_here/.local/bin/eso-banana-script
+User=deck
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Finally, install `eso-banana` using pip and install the systemd timer and service to run `eso-banana` everyday.
+
+```
+cd ./banana/
+pip install .
 cp banana.timer banana.service /etc/systemd/system/
 sudo systemctl enable banana.timer
 sudo systemctl enable banana.service
 ```
 
 # Linux Unschedule
+
+Only run the following command if you wish to remove scheduled run of `eso-banana`.
+
+```
+systemctl list-timers --all
+sudo systemctl disable banana.timer
+```
+
+# Steam Deck Installation
+
+The following instructions are for arch linux system using systemd.
+
+```
+sudo btrfs property set -ts / ro false
+sudo pacman-key --init
+sudo pacman-key --populate archlinux
+sudo pacman -S python-pip
+cd ./banana/
+pip install .
+cp banana.timer banana.service /etc/systemd/system/
+sudo systemctl enable banana.timer
+sudo systemctl enable banana.service
+```
+
+# Steam Deck
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
 

@@ -4,7 +4,7 @@ Wants=banana.timer
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/python3 /home/deck/banana.py
+ExecStart=/home/deck/.local/bin/eso-banana-script
 User=deck
 
 [Install]
