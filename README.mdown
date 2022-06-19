@@ -98,6 +98,7 @@ sudo apt install python3-pip
 ```
 
 Because systemd is cancer you will need to edit the `banana.service` file to include your user's home path.
+In the unlikely event that the script is not installed to `~/.local/bin/eso-banana-script`, open a new terminal and use the results from `which eso-banana-script`.
 
 ```
 [Unit]
