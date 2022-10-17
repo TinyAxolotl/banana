@@ -122,7 +122,7 @@ If the mentioned command is missing your may need to restart the TTY.
 
 4. The created file can be edited with vim to include additional adddon URLs at the following path.
 
-`vim ~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.text`
+`vim "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.text"`
 
 It will look similar to the following:
 
