@@ -88,6 +88,70 @@ Unregister-ScheduledTask eso-banana
 
 Press enter to confirm removal.
 
+# Steam Deck Installation
+
+The following instructions are for arch linux system installed with the Steam Deck.
+
+0. From the [Steam Deck instructions](https://help.steampowered.com/en/faqs/view/671A-4453-E8D2-323C):
+
+> From the STEAM menu, select Power, then Switch to Desktop
+
+1. Once you've become familiar with desktop mode, open a terminal and enter the following commands to install python.
+
+```
+sudo btrfs property set -ts / ro false
+sudo pacman-key --init
+sudo pacman-key --populate archlinux
+sudo pacman -S python-pip
+```
+
+2. Run the following commands to download this project and install the scheduled service.
+
+```
+wget https://joyo.dev/eso/banana/archive/master.tar.gz -O banana.tgz
+tar xvf banana.tgz
+cd ./banana/
+pip install .
+cp banana.timer banana.service /etc/systemd/system/
+sudo systemctl enable banana.timer
+sudo systemctl enable banana.service
+```
+
+3. Now that `eso-banana-script` has been installed, run it once to create the `addons.text` file.
+If the mentioned command is missing your may need to restart the TTY.
+
+4. The created file can be edited with vim to include additional adddon URLs at the following path.
+
+`vim ~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.text`
+
+It will look similar to the following:
+
+```
+https://www.esoui.com/downloads/info7-LibAddonMenu.html
+https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
+https://www.esoui.com/downloads/info1146-LibCustomMenu.html
+```
+
+Add the ESOUI url for each additional addon you wish to keep updated.
+Make sure to include the `www.` indicator that ESOUI requires for some stupid reason.
+
+5. Run `eso-banana-script` once more to download and install the additional addons.
+
+6. To return to [Gaming Mode](https://help.steampowered.com/en/faqs/view/671A-4453-E8D2-323C):
+
+> ...there's a shortcut link to 'Return to Gaming Mode'.
+> Select that to get back to standard Steam Deck UI.
+> You can also go through the system menus to Log Off to get back.
+
+# Steam Deck Unschedule
+
+Only run the following command if you wish to remove scheduled run of `eso-banana`.
+
+```
+systemctl list-timers --all
+sudo systemctl disable banana.timer
+```
+
 # Linux Installation
 
 The following instructions are for any linux system using systemd.
@@ -125,31 +189,6 @@ sudo systemctl enable banana.service
 ```
 
 # Linux Unschedule
-
-Only run the following command if you wish to remove scheduled run of `eso-banana`.
-
-```
-systemctl list-timers --all
-sudo systemctl disable banana.timer
-```
-
-# Steam Deck Installation
-
-The following instructions are for arch linux system using systemd.
-
-```
-sudo btrfs property set -ts / ro false
-sudo pacman-key --init
-sudo pacman-key --populate archlinux
-sudo pacman -S python-pip
-cd ./banana/
-pip install .
-cp banana.timer banana.service /etc/systemd/system/
-sudo systemctl enable banana.timer
-sudo systemctl enable banana.service
-```
-
-# Steam Deck Unschedule
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
 
