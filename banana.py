@@ -167,6 +167,30 @@ def parsing_live(path: Path):
 
     return addon_name, _version, path
 
+def eso_live_path_get():
+    if system() == "Windows":
+        eso_live_path = Path.home().joinpath(
+            "Documents\Elder Scrolls Online\live"
+        )
+        if eso_live_path.exists:
+            return eso_live_path
+
+    else:
+        eso_live_path = Path.home().joinpath(
+            ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
+        )
+
+        if eso_live_path.exists():
+            return eso_live_path
+        
+        eso_live_path = Path.home().joinpath(
+            ".var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live"
+        )
+
+        if eso_live_path.exists():
+            return eso_live_path
+    
+    raise Exception("Unable to find `steamuser/Documents/Elder Scrolls Online/live`, specify the full path and contact maintainer to see if they'll add it.")
 
 def periodical_script():
     parser = ArgumentParser(
@@ -180,14 +204,7 @@ def periodical_script():
     if args.eso_live_path:
         args.eso_live_path = Path(args.eso_live_path)
     else:
-        if system() == "Windows":
-            args.eso_live_path = Path.home().joinpath(
-                "Documents\Elder Scrolls Online\live"
-            )
-        else:
-            args.eso_live_path = Path.home().joinpath(
-                ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
-            )
+        args.eso_live_path = eso_live_path_get()
 
     if args.verbose:
         level = logging.DEBUG
@@ -246,14 +263,7 @@ def ttc():
     if args.eso_live_path:
         args.eso_live_path = Path(args.eso_live_path)
     else:
-        if system() == "Windows":
-            args.eso_live_path = Path.home().joinpath(
-                "Documents\Elder Scrolls Online\live"
-            )
-        else:
-            args.eso_live_path = Path.home().joinpath(
-                ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
-            )
+        args.eso_live_path = eso_live_path_get()
 
     if args.verbose:
         level = logging.DEBUG
