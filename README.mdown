@@ -27,7 +27,7 @@ Follow the installation instructions for your `platform`:
 - [Windows](#windows-installation)
 - [Linux](#linux-installation)
 
-On first run, the `addons.text` file will be created in your ESO live directory.
+On first run, the `addons.list` file will be created in your ESO live directory.
 It will look similar to the following:
 
 ```
@@ -117,12 +117,12 @@ sudo systemctl enable banana.timer
 sudo systemctl enable banana.service
 ```
 
-3. Now that `eso-banana-script` has been installed, run it once to create the `addons.text` file.
+3. Now that `eso-banana-script` has been installed, run it once to create the `addons.list` file.
 If the mentioned command is missing your may need to restart the TTY.
 
 4. The created file can be edited with vim to include additional adddon URLs at the following path.
 
-`vim "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.text"`
+`vim "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.list"`
 
 It will look similar to the following:
 

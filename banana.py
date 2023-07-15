@@ -6,6 +6,7 @@ from pathlib import Path
 from platform import system
 from shutil import rmtree, copytree
 from tempfile import TemporaryDirectory
+from typing import Tuple
 from zipfile import ZipFile
 import logging
 import re
@@ -39,6 +40,7 @@ def live_to_esoui(*, path: Path, esoui_uris: list):
         if live_name in _name:
             esoui_name, esoui_version, esoui_uri = _name, _version, _uri
             break
+
 
     if not esoui_name:
         rmtree(live_path)
@@ -113,7 +115,7 @@ live_version = re.compile("##\s+Version:\s+.*")
 live_version_split = re.compile("##\s+Version:\s+")
 
 
-def esoui_parse(url: str):
+def esoui_parse(url: str) -> Tuple[str, version.Version, str]:
     addon_name = esoui_prefix.split(url)[1]
     addon_name = addon_name.split(".html")[0]
 
@@ -122,7 +124,11 @@ def esoui_parse(url: str):
 
     version_line = esoui_version_html.search(response.text).group(0)
     _version = esoui_version_split.split(version_line)[1]
-    _version = version.parse(_version)
+    try:
+        _version = version.parse(_version)
+    except version.InvalidVersion:
+        _version = version.parse("1")
+        return
 
     esoui_page_url = url.replace("info", "download").replace(".html", "")
 
@@ -161,7 +167,10 @@ def parsing_live(path: Path):
     if result:
         _version = result.group(0)
         _version = live_version_split.split(_version)[1]
-        _version = version.parse(_version)
+        try:
+            _version = version.parse(_version)
+        except version.InvalidVersion:
+            _version = version.parse("0")
     else:
         _version = version.parse("0")
 
@@ -228,7 +237,7 @@ def periodical_script():
     logging.info(args)
 
 
-    config_path = Path(args.eso_live_path).joinpath("addons.text")
+    config_path = Path(args.eso_live_path).joinpath("addons.list")
 
     if not config_path.exists():
         config_new(config_path)
@@ -244,7 +253,8 @@ def periodical_script():
 
     for url in config_current:
         esoui = esoui_parse(url)
-        esoui_uris.append(esoui)
+        if esoui:
+            esoui_uris.append(esoui)
 
     for child in live_path.iterdir():
         live_to_esoui(path=child, esoui_uris=esoui_uris)
