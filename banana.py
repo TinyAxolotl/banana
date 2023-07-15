@@ -128,7 +128,6 @@ def esoui_parse(url: str) -> Tuple[str, version.Version, str]:
         _version = version.parse(_version)
     except version.InvalidVersion:
         _version = version.parse("1")
-        return
 
     esoui_page_url = url.replace("info", "download").replace(".html", "")
 
@@ -201,7 +200,7 @@ def eso_live_path_get():
     
     raise Exception("Unable to find `steamuser/Documents/Elder Scrolls Online/live`, specify the full path and contact maintainer to see if they'll add it.")
 
-def periodical_script():
+def unlisted_remove():
     parser = ArgumentParser(
         description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
     )
@@ -258,6 +257,64 @@ def periodical_script():
 
     for child in live_path.iterdir():
         live_to_esoui(path=child, esoui_uris=esoui_uris)
+
+    esoui_to_live(esoui_uris=esoui_uris, live_path=live_path)
+    ttc_update(live_path=live_path)
+
+def periodical_script():
+    parser = ArgumentParser(
+        description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
+    )
+    parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
+    parser.add_argument("-l", "--log", action="store_true")
+    parser.add_argument("-p", "--eso_live_path")
+    args = parser.parse_args()
+
+    if args.eso_live_path:
+        args.eso_live_path = Path(args.eso_live_path)
+    else:
+        args.eso_live_path = eso_live_path_get()
+
+    if args.verbose:
+        level = logging.DEBUG
+        format = "%(asctime)s %(filename)s:%(lineno)d %(message)s"
+    else:
+        level = logging.INFO
+        format = "%(asctime)s %(message)s"
+
+    if args.log:
+        logging.basicConfig(
+            level=level,
+            format=format,
+            filename=args.eso_live_path.joinpath("banana.log"),
+        )
+    else:
+        logging.basicConfig(
+            level=level,
+            format=format,
+        )
+
+    logging.info(args)
+
+
+    config_path = Path(args.eso_live_path).joinpath("addons.list")
+
+    if not config_path.exists():
+        config_new(config_path)
+        logging.info(f'addons list created at "{config_path}"')
+
+    with config_path.open("r") as file_open:
+        config_current = [line.rstrip('\n') for line in file_open]
+
+    config_current = filter(None, config_current)
+    live_path = args.eso_live_path.joinpath("AddOns")
+    live_path.mkdir(parents=True, exist_ok=True)
+    esoui_uris = list()
+
+    for url in config_current:
+        esoui = esoui_parse(url)
+        if esoui:
+            esoui_uris.append(esoui)
 
     esoui_to_live(esoui_uris=esoui_uris, live_path=live_path)
     ttc_update(live_path=live_path)
