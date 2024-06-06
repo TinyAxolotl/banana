@@ -69,12 +69,9 @@ https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 )
 
 var (
-	ESOUI_PREFIX        = regexp.MustCompile(`https://www.esoui.com/downloads/info[0-9]+\-`)
-	ESOUI_DOWNLOAD      = regexp.MustCompile(`https://cdn.esoui.com/downloads/file[^"]*`)
-	ESOUI_VERSION_HTML  = regexp.MustCompile(`<div\s+id="version">Version:\s+[^<]+`)
-	ESOUI_VERSION_SPLIT = regexp.MustCompile(`<div\s+id="version">Version:\s+`)
-	LIVE_VERSION        = regexp.MustCompile(`##\s+Version:\s+.*`)
-	LIVE_VERSION_SPLIT  = regexp.MustCompile(`##\s+Version:\s+`)
+	ESOUI_NAME    = regexp.MustCompile(`(?:https://www.esoui.com/downloads/info[0-9]+\-)([A-Za-z]+)(?:\.html)`)
+	ESOUI_VERSION = regexp.MustCompile(`(?:<div\s+id="version">Version:\s+)(.*)(?:</div>)`)
+	LIVE_VERSION  = regexp.MustCompile(`(?:##\s+Version:\s+)(.*)`)
 )
 
 func eso_live_path_get() string {
@@ -142,6 +139,9 @@ type EsoUI struct {
 }
 
 func esoui_init(addon_url string) (EsoUI, error) {
+	addon_name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
+	dowload_uri := strings.Replace(addon_url, "info", "download", -1)
+
 	response, error := http.Get(addon_url)
 	if error != nil {
 		return EsoUI{}, error
@@ -157,10 +157,7 @@ func esoui_init(addon_url string) (EsoUI, error) {
 		return EsoUI{}, error
 	}
 
-	addon_name := string(ESOUI_PREFIX.Find([]byte(addon_url)))
-	dowload_uri := string(ESOUI_DOWNLOAD.Find(body))
-	version_html := string(ESOUI_VERSION_HTML.Find(body))
-	version := string(ESOUI_VERSION_SPLIT.Find([]byte(version_html)))
+	version := ESOUI_VERSION.FindStringSubmatch(string(body))[1]
 
 	return EsoUI{addon_name, version, dowload_uri}, nil
 }
