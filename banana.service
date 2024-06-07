@@ -1,5 +1,5 @@
 [Unit]
-Description=Run banana daily and on boot.
+Description="Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
 Wants=banana.timer
 
 [Service]

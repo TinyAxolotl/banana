@@ -25,7 +25,7 @@ Make a copy of the `live` folder and rename it to something meaningful like `old
 Follow the installation instructions for your `platform`:
 
 - [Windows](#windows-installation)
-- [Linux](#linux-installation)
+- [SteamOS](#steamos-installation)
 
 On first run, the `addons.list` file will be created in your ESO live directory.
 It will look similar to the following:
@@ -108,16 +108,16 @@ Note: banana will create and `addons.list` file which can be edited to include a
 # SteamOS Optional
 
 Because systemd is cancer you will need to edit the `banana.service` file to include your user's home path.
-In the unlikely event that the script is not installed to `~/.local/bin/banana.elf`, open a new terminal and use the results from `which banana.elf`.
+If `banana` is not installed to `~/.local/bin/banana.elf`, open a new terminal and use the results from `which banana.elf`.
 
 ```
 [Unit]
-Description=Run ESO banana daily and on boot.
+Description="Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater."
 Wants=banana.timer
 
 [Service]
 Type=oneshot
-ExecStart=/home/user_name_here/.local/bin/banana.elf
+ExecStart=/home/<user_name_here>/.local/bin/banana.elf
 User=deck
 
 [Install]
