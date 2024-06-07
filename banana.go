@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/alexflint/go-arg"
 
+	"archive/zip"
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -23,17 +25,14 @@ var args struct {
 
 func main() {
 	arg.MustParse(&args)
-	fmt.Println("args", args)
-
 	eso_live_path := eso_live_path_get()
-
 	if args.Addon_list_path == "" {
 		args.Addon_list_path = filepath.Join(eso_live_path, "addons.list")
 	}
-
 	if args.Out_dir == "" {
-		args.Out_dir = filepath.Join(eso_live_path)
+		args.Out_dir = filepath.Join(eso_live_path, "AddOns")
 	}
+	fmt.Println("args", args)
 
 	_, error := os.Stat(args.Addon_list_path)
 	if errors.Is(error, os.ErrNotExist) {
@@ -48,7 +47,7 @@ func main() {
 		panic(error)
 	}
 
-	addon_paths, error := os.ReadDir(filepath.Join(args.Out_dir, "AddOns"))
+	addon_paths, error := os.ReadDir(args.Out_dir)
 	if error != nil {
 		panic(error)
 	}
@@ -61,7 +60,6 @@ func main() {
 	}
 
 	var eso_ui_list []EsoAddon
-
 	for _, url := range addon_urls {
 		eso_ui, error := eso_ui_stat_init(url)
 		if error != nil {
@@ -72,7 +70,6 @@ func main() {
 	}
 
 	var eso_live_list []EsoAddon
-
 	for _, eso_live_name := range eso_live_addon_names {
 		eso_live, error := eso_live_stat_init(eso_live_name)
 		if error != nil {
@@ -97,10 +94,14 @@ func main() {
 	}
 
 	for _, eso_live := range eso_live_list {
-		fmt.Printf("Live \"%s\" %s\n", eso_live.path, eso_live.version)
+		fmt.Printf("Live, %s, %s\n", eso_live.name, eso_live.version)
 	}
 	for _, eso_ui := range eso_ui_list {
-		fmt.Printf("EsoUI \"%s\" %s\n", eso_ui.path, eso_ui.version)
+		fmt.Printf("Update, %s, %s\n", eso_ui.name, eso_ui.version)
+		error = eso_ui_get_unzip(eso_ui.path, args.Out_dir)
+		if error != nil {
+			panic(error)
+		}
 	}
 }
 
@@ -116,9 +117,10 @@ https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 )
 
 var (
-	ESOUI_NAME    = regexp.MustCompile(`(?:https://www.esoui.com/downloads/info[0-9]+\-)([A-Za-z]+)(?:\.html)`)
-	ESOUI_VERSION = regexp.MustCompile(`(?:<div\s+id="version">Version:\s+)(.*)(?:</div>)`)
-	LIVE_VERSION  = regexp.MustCompile(`(?:##\s+Version:\s+)(.*)(?:\n)`)
+	ESOUI_NAME     = regexp.MustCompile(`(?:https://www.esoui.com/downloads/info[0-9]+\-)([A-Za-z]+)(?:\.html)`)
+	ESOUI_VERSION  = regexp.MustCompile(`(?:<div\s+id="version">Version:\s+)(.*)(?:</div>)`)
+	ESOUI_DOWNLOAD = regexp.MustCompile(`https://cdn.esoui.com/downloads/file[^"]*`)
+	LIVE_VERSION   = regexp.MustCompile(`(?:##\s+Version:\s+)(.*)(?:\n)`)
 )
 
 func eso_live_path_get() string {
@@ -186,30 +188,46 @@ type EsoAddon struct {
 }
 
 func eso_ui_stat_init(addon_url string) (EsoAddon, error) {
-	response, error := http.Get(addon_url)
+	addon_resp, error := http.Get(addon_url)
 	if error != nil {
 		return EsoAddon{}, error
 	}
-	defer response.Body.Close()
+	defer addon_resp.Body.Close()
 
-	if response.StatusCode == http.StatusNotFound {
-		return EsoAddon{}, errors.New(http.StatusText(response.StatusCode))
+	if addon_resp.StatusCode == http.StatusNotFound {
+		return EsoAddon{}, errors.New(http.StatusText(addon_resp.StatusCode))
 	}
 
-	body, error := io.ReadAll(response.Body)
+	addon_body, error := io.ReadAll(addon_resp.Body)
+	if error != nil {
+		return EsoAddon{}, error
+	}
+
+	download_page_url := strings.Replace(addon_url, "info", "download", -1)
+	download_resp, error := http.Get(download_page_url)
+	if error != nil {
+		return EsoAddon{}, error
+	}
+	defer download_resp.Body.Close()
+
+	if download_resp.StatusCode == http.StatusNotFound {
+		return EsoAddon{}, errors.New(http.StatusText(download_resp.StatusCode))
+	}
+
+	download_body, error := io.ReadAll(download_resp.Body)
 	if error != nil {
 		return EsoAddon{}, error
 	}
 
 	name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
-	version := ESOUI_VERSION.FindStringSubmatch(string(body))[1]
-	path := strings.Replace(addon_url, "info", "download", -1)
+	version := ESOUI_VERSION.FindStringSubmatch(string(addon_body))[1]
+	path := string(ESOUI_DOWNLOAD.Find(download_body))
 
 	return EsoAddon{name, version, path}, nil
 }
 
 func eso_live_stat_init(eso_live_name string) (EsoAddon, error) {
-	path := filepath.Join(args.Out_dir, "AddOns", eso_live_name)
+	path := filepath.Join(args.Out_dir, eso_live_name)
 
 	content, error := os.ReadFile(filepath.Join(path, eso_live_name+".txt"))
 	if error != nil {
@@ -219,4 +237,51 @@ func eso_live_stat_init(eso_live_name string) (EsoAddon, error) {
 	version := LIVE_VERSION.FindStringSubmatch(string(content))[1]
 
 	return EsoAddon{eso_live_name, version, path}, nil
+}
+
+func eso_ui_get_unzip(esoui_url string, out_dir string) error {
+	response, error := http.Get(esoui_url)
+	if error != nil {
+		return error
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusNotFound {
+		return errors.New(http.StatusText(response.StatusCode))
+	}
+
+	body, error := io.ReadAll(response.Body)
+	if error != nil {
+		return error
+	}
+
+	reader := bytes.NewReader(body)
+	zip_reader, error := zip.NewReader(reader, int64(len(body)))
+	if error != nil {
+		return error
+	}
+
+	for _, zipped_file := range zip_reader.File {
+		if zipped_file.Mode().IsDir() {
+			continue
+		}
+
+		zipped_file_open, error := zipped_file.Open()
+		if error != nil {
+			return error
+		}
+
+		name := filepath.Join(out_dir, zipped_file.Name)
+		os.MkdirAll(filepath.Dir(name), os.ModePerm)
+
+		create, error := os.Create(name)
+		if error != nil {
+			return error
+		}
+		defer create.Close()
+
+		create.ReadFrom(zipped_file_open)
+	}
+
+	return nil
 }
