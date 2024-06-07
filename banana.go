@@ -52,7 +52,7 @@ func main() {
 		panic(error)
 	}
 
-	fmt.Println("Update,", TCC_PRICE_TABLE_URI)
+	fmt.Println("Updated,", TCC_PRICE_TABLE_URI)
 
 	if args.Ttc {
 		return
@@ -84,7 +84,7 @@ func main() {
 	for _, eso_live_name := range eso_live_addon_names {
 		eso_live, error := eso_live_stat_init(eso_live_name)
 		if error != nil {
-			panic(error)
+			continue
 		}
 
 		matching := ""
@@ -96,8 +96,8 @@ func main() {
 		}
 
 		if matching == "" {
-			fmt.Println("Removing inactive addon", eso_live.path)
-			// TODO os.RemoveAll(eso_live.path)
+			fmt.Println("Removed,", eso_live.path)
+			os.RemoveAll(eso_live.path)
 			continue
 		}
 
@@ -108,7 +108,7 @@ func main() {
 		fmt.Printf("Live, %s, %s\n", eso_live.name, eso_live.version)
 	}
 	for _, eso_ui := range eso_ui_list {
-		fmt.Printf("Update, %s, %s\n", eso_ui.name, eso_ui.version)
+		fmt.Printf("Updated, %s, %s\n", eso_ui.name, eso_ui.version)
 		error = eso_ui_get_unzip(eso_ui.path, args.Out_dir)
 		if error != nil {
 			panic(error)
