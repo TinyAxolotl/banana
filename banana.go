@@ -31,6 +31,10 @@ func main() {
 		args.Addon_list_path = filepath.Join(eso_live_path, "addons.list")
 	}
 
+	if args.Out_dir == "" {
+		args.Out_dir = filepath.Join(eso_live_path)
+	}
+
 	_, error := os.Stat(args.Addon_list_path)
 	if errors.Is(error, os.ErrNotExist) {
 		error = addon_list_create(args.Addon_list_path)
@@ -44,16 +48,43 @@ func main() {
 		panic(error)
 	}
 
-	var esoui_list []EsoUI
+	addon_paths, error := os.ReadDir(filepath.Join(args.Out_dir, "AddOns"))
+	if error != nil {
+		panic(error)
+	}
+
+	var eso_live_addon_names []string
+	for _, path := range addon_paths {
+		if path.IsDir() {
+			eso_live_addon_names = append(eso_live_addon_names, path.Name())
+		}
+	}
+
+	var eso_ui_list []EsoAddon
 
 	for _, url := range addon_urls {
-		esoui, error := esoui_init(url)
+		eso_ui, error := eso_ui_stat_init(url)
 		if error != nil {
 			panic(error)
 		}
 
-		esoui_list = append(esoui_list, esoui)
-		fmt.Println(esoui)
+		eso_ui_list = append(eso_ui_list, eso_ui)
+	}
+
+	for _, eso_live_name := range eso_live_addon_names {
+		matching := ""
+
+		for _, eso_ui := range eso_ui_list {
+			if strings.Contains(eso_live_name, eso_ui.addon_name) {
+				matching = eso_live_name
+			}
+		}
+
+		if matching == "" {
+			addon_path := filepath.Join(args.Out_dir, "AddOns", eso_live_name)
+			fmt.Println("Removing inactive addon", addon_path)
+			// TODO os.RemoveAll(addon_path)
+		}
 	}
 }
 
@@ -132,32 +163,31 @@ func addon_list_read(addon_list_path string) ([]string, error) {
 	return lines, nil
 }
 
-type EsoUI struct {
+type EsoAddon struct {
 	addon_name  string
 	version     string
 	dowload_uri string
 }
 
-func esoui_init(addon_url string) (EsoUI, error) {
-	addon_name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
-	dowload_uri := strings.Replace(addon_url, "info", "download", -1)
-
+func eso_ui_stat_init(addon_url string) (EsoAddon, error) {
 	response, error := http.Get(addon_url)
 	if error != nil {
-		return EsoUI{}, error
+		return EsoAddon{}, error
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusNotFound {
-		return EsoUI{}, errors.New(http.StatusText(response.StatusCode))
+		return EsoAddon{}, errors.New(http.StatusText(response.StatusCode))
 	}
 
 	body, error := io.ReadAll(response.Body)
 	if error != nil {
-		return EsoUI{}, error
+		return EsoAddon{}, error
 	}
 
+	addon_name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
 	version := ESOUI_VERSION.FindStringSubmatch(string(body))[1]
+	dowload_uri := strings.Replace(addon_url, "info", "download", -1)
 
-	return EsoUI{addon_name, version, dowload_uri}, nil
+	return EsoAddon{addon_name, version, dowload_uri}, nil
 }
