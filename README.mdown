@@ -45,7 +45,7 @@ Make sure to include the `www.` indicator that ESOUI requires for some stupid re
 
 1. Add the executable to the [user's path](https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows) or replace "banana.exe" with the full path to where the executable is stored.
 
-2. Run the executable from the commandline with `banana.exe -h` for usage.
+2. Run the executable from the commandline `banana.exe` for a default AddOn update or with `banana.exe -h` for usage.
 
 # Windows Optional
 
@@ -93,7 +93,7 @@ The following instructions are for arch linux system installed with the Steam De
 
 	- optionally replace "banana.elf" with the full path to where the executable is stored.
 
-3. Run the executable from the commandline with `banana.elf -h` for usage.
+2. Run the executable from the commandline `banana.elf` for a default AddOn update or with `banana.elf -h` for usage.
 
 Note: banana will create and `addons.list` file which can be edited to include additional adddon URLs at the following path:
 
