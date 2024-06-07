@@ -4,7 +4,7 @@ Elder Scrolls Online addon manager and a Tamriel Trade Centre price table update
 
 [MIT License](LICENSE)
 
-It is recommended that you back up your ESO live profile before using `eso-banana` in case you want to revert back.
+It is recommended that you back up your ESO live profile before using `banana` in case you want to revert back.
 
 On Windows, press `Windows Key + e` to open a file explorer and enter the following path in the address bar:
 
@@ -41,27 +41,18 @@ Make sure to include the `www.` indicator that ESOUI requires for some stupid re
 
 # Windows Installation
 
-Install the latest Python 3 using the installer provided by [python.org](https://www.python.org/downloads/windows/).
-When the python installer asks, [add python to PATH](https://docs.python.org/3/using/windows.html#installation-steps).
+0. Download the latest `banana.exe` release for [Windows](https://git.joyo.dev/eso/banana/releases/).
 
-Open [Windows Terminal](https://www.microsoft.com/en-US/p/windows-terminal/9n0dx20hk701) or any windows command prompt and navigate to this project.
-Use the Python package manager PIP to install `eso-banana`.
+1. Add the executable to the [user's path](https://www.wikihow.com/Change-the-PATH-Environment-Variable-on-Windows) or replace "banana.exe" with the full path to where the executable is stored.
 
-```powershell
-cd .\banana\
-pip install .
-```
+2. Run the executable from the commandline with `banana.exe -h` for usage.
 
-Once the project is installed to python's packages you may invoke the addon script with the following command:
+# Windows Optional
+
+To schedule a periodic background run of `banana`, open Powershell as a user and enter the following commands.
 
 ```powershell
-eso-banana-script.exe
-```
-
-To schedule a periodic background run of `eso-banana`, open Powershell as a user and enter the following commands.
-
-```powershell
-$Command = (Get-Command "eso-banana-script.exe").Source
+$Command = (Get-Command "banana.exe").Source
 $Action = New-ScheduledTaskAction -Execute $Command -Argument "--log"
 $Trigger = New-ScheduledTaskTrigger -Daily -At 11am
 $Settings = New-ScheduledTaskSettingsSet -RunOnlyIfNetworkAvailable -StartWhenAvailable -RunOnlyIfIdle
@@ -76,7 +67,7 @@ TaskPath                                TaskName                          State
 \                                       eso-banana                        Ready
 ```
 
-# Windows Unschedule
+## Windows Unschedule
 
 Only run the following command if you wish to remove scheduled run of `eso-banana`.
 
@@ -88,7 +79,7 @@ Unregister-ScheduledTask eso-banana
 
 Press enter to confirm removal.
 
-# Steam Deck Installation
+# SteamOS Installation
 
 The following instructions are for arch linux system installed with the Steam Deck.
 
@@ -96,101 +87,55 @@ The following instructions are for arch linux system installed with the Steam De
 
 > From the STEAM menu, select Power, then Switch to Desktop
 
-1. Once you've become familiar with desktop mode, open a terminal and enter the following commands to install python.
+1. Download the latest `banana.elf` release for [SteamOS](https://git.joyo.dev/eso/banana/releases/).
 
-```
-sudo btrfs property set -ts / ro false
-sudo pacman-key --init
-sudo pacman-key --populate archlinux
-sudo pacman -S python-pip
-```
+2. Set executable with `chmod +x banana.elf` and add the executable to `~/.local/bin/` or any directory in the user's $PATH environment.
 
-2. Run the following commands to download this project and install the scheduled service.
+	- optionally replace "banana.elf" with the full path to where the executable is stored.
 
-```
-wget https://joyo.dev/eso/banana/archive/master.tar.gz -O banana.tgz
-tar xvf banana.tgz
-cd ./banana/
-pip install .
-cp banana.timer banana.service /etc/systemd/system/
-sudo systemctl enable banana.timer
-sudo systemctl enable banana.service
-```
+3. Run the executable from the commandline with `banana.elf -h` for usage.
 
-3. Now that `eso-banana-script` has been installed, run it once to create the `addons.list` file.
-If the mentioned command is missing your may need to restart the TTY.
+Note: banana will create and `addons.list` file which can be edited to include additional adddon URLs at the following path:
 
-4. The created file can be edited with vim to include additional adddon URLs at the following path.
+`$EDITOR "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.list"`
 
-`vim "~/.steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/addons.list"`
-
-It will look similar to the following:
-
-```
-https://www.esoui.com/downloads/info7-LibAddonMenu.html
-https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
-https://www.esoui.com/downloads/info1146-LibCustomMenu.html
-```
-
-Add the ESOUI url for each additional addon you wish to keep updated.
-Make sure to include the `www.` indicator that ESOUI requires for some stupid reason.
-
-5. Run `eso-banana-script` once more to download and install the additional addons.
-
-6. To return to [Gaming Mode](https://help.steampowered.com/en/faqs/view/671A-4453-E8D2-323C):
+5. To return to [Gaming Mode](https://help.steampowered.com/en/faqs/view/671A-4453-E8D2-323C):
 
 > ...there's a shortcut link to 'Return to Gaming Mode'.
 > Select that to get back to standard Steam Deck UI.
 > You can also go through the system menus to Log Off to get back.
 
-# Steam Deck Unschedule
-
-Only run the following command if you wish to remove scheduled run of `eso-banana`.
-
-```
-systemctl list-timers --all
-sudo systemctl disable banana.timer
-```
-
-# Linux Installation
-
-The following instructions are for any linux system using systemd.
-Using your distros package management system, install python3-pip.
-
-```
-sudo apt install python3-pip
-```
+# SteamOS Optional
 
 Because systemd is cancer you will need to edit the `banana.service` file to include your user's home path.
-In the unlikely event that the script is not installed to `~/.local/bin/eso-banana-script`, open a new terminal and use the results from `which eso-banana-script`.
+In the unlikely event that the script is not installed to `~/.local/bin/banana.elf`, open a new terminal and use the results from `which banana.elf`.
 
 ```
 [Unit]
-Description=Run banana daily and on boot.
+Description=Run ESO banana daily and on boot.
 Wants=banana.timer
 
 [Service]
 Type=oneshot
-ExecStart=/home/user_name_here/.local/bin/eso-banana-script
+ExecStart=/home/user_name_here/.local/bin/banana.elf
 User=deck
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Finally, install `eso-banana` using pip and install the systemd timer and service to run `eso-banana` everyday.
+Finally, install the systemd timer and service to run `banana` everyday.
 
 ```
 cd ./banana/
-pip install .
 cp banana.timer banana.service /etc/systemd/system/
 sudo systemctl enable banana.timer
 sudo systemctl enable banana.service
 ```
 
-# Linux Unschedule
+## SteamOS Unschedule
 
-Only run the following command if you wish to remove scheduled run of `eso-banana`.
+Only run the following command if you wish to remove scheduled run of `banana`.
 
 ```
 systemctl list-timers --all

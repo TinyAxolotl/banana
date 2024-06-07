@@ -4,7 +4,7 @@ Wants=banana.timer
 
 [Service]
 Type=oneshot
-ExecStart=/home/deck/.local/bin/eso-banana-script
+ExecStart=/home/deck/.local/bin/banana.elf
 User=deck
 
 [Install]
