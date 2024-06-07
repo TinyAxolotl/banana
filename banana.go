@@ -47,6 +47,17 @@ func main() {
 		panic(error)
 	}
 
+	error = ttc_update(filepath.Join(args.Out_dir, "TamrielTradeCentre"))
+	if error != nil {
+		panic(error)
+	}
+
+	fmt.Println("Update,", TCC_PRICE_TABLE_URI)
+
+	if args.Ttc {
+		return
+	}
+
 	addon_paths, error := os.ReadDir(args.Out_dir)
 	if error != nil {
 		panic(error)
@@ -272,6 +283,53 @@ func eso_ui_get_unzip(esoui_url string, out_dir string) error {
 		}
 
 		name := filepath.Join(out_dir, zipped_file.Name)
+		os.MkdirAll(filepath.Dir(name), os.ModePerm)
+
+		create, error := os.Create(name)
+		if error != nil {
+			return error
+		}
+		defer create.Close()
+
+		create.ReadFrom(zipped_file_open)
+	}
+
+	return nil
+}
+
+func ttc_update(out_path string) error {
+	response, error := http.Get(TCC_PRICE_TABLE_URI)
+	if error != nil {
+		return error
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusNotFound {
+		return errors.New(http.StatusText(response.StatusCode))
+	}
+
+	body, error := io.ReadAll(response.Body)
+	if error != nil {
+		return error
+	}
+
+	reader := bytes.NewReader(body)
+	zip_reader, error := zip.NewReader(reader, int64(len(body)))
+	if error != nil {
+		return error
+	}
+
+	for _, zipped_file := range zip_reader.File {
+		if zipped_file.Mode().IsDir() {
+			continue
+		}
+
+		zipped_file_open, error := zipped_file.Open()
+		if error != nil {
+			return error
+		}
+
+		name := filepath.Join(out_path, zipped_file.Name)
 		os.MkdirAll(filepath.Dir(name), os.ModePerm)
 
 		create, error := os.Create(name)
