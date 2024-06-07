@@ -71,20 +71,36 @@ func main() {
 		eso_ui_list = append(eso_ui_list, eso_ui)
 	}
 
+	var eso_live_list []EsoAddon
+
 	for _, eso_live_name := range eso_live_addon_names {
+		eso_live, error := eso_live_stat_init(eso_live_name)
+		if error != nil {
+			panic(error)
+		}
+
 		matching := ""
 
 		for _, eso_ui := range eso_ui_list {
-			if strings.Contains(eso_live_name, eso_ui.addon_name) {
+			if strings.Contains(eso_live_name, eso_ui.name) {
 				matching = eso_live_name
 			}
 		}
 
 		if matching == "" {
-			addon_path := filepath.Join(args.Out_dir, "AddOns", eso_live_name)
-			fmt.Println("Removing inactive addon", addon_path)
-			// TODO os.RemoveAll(addon_path)
+			fmt.Println("Removing inactive addon", eso_live.path)
+			// TODO os.RemoveAll(eso_live.path)
+			continue
 		}
+
+		eso_live_list = append(eso_live_list, eso_live)
+	}
+
+	for _, eso_live := range eso_live_list {
+		fmt.Printf("Live \"%s\" %s\n", eso_live.path, eso_live.version)
+	}
+	for _, eso_ui := range eso_ui_list {
+		fmt.Printf("EsoUI \"%s\" %s\n", eso_ui.path, eso_ui.version)
 	}
 }
 
@@ -102,7 +118,7 @@ https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 var (
 	ESOUI_NAME    = regexp.MustCompile(`(?:https://www.esoui.com/downloads/info[0-9]+\-)([A-Za-z]+)(?:\.html)`)
 	ESOUI_VERSION = regexp.MustCompile(`(?:<div\s+id="version">Version:\s+)(.*)(?:</div>)`)
-	LIVE_VERSION  = regexp.MustCompile(`(?:##\s+Version:\s+)(.*)`)
+	LIVE_VERSION  = regexp.MustCompile(`(?:##\s+Version:\s+)(.*)(?:\n)`)
 )
 
 func eso_live_path_get() string {
@@ -164,9 +180,9 @@ func addon_list_read(addon_list_path string) ([]string, error) {
 }
 
 type EsoAddon struct {
-	addon_name  string
-	version     string
-	dowload_uri string
+	name    string
+	version string
+	path    string
 }
 
 func eso_ui_stat_init(addon_url string) (EsoAddon, error) {
@@ -185,9 +201,22 @@ func eso_ui_stat_init(addon_url string) (EsoAddon, error) {
 		return EsoAddon{}, error
 	}
 
-	addon_name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
+	name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
 	version := ESOUI_VERSION.FindStringSubmatch(string(body))[1]
-	dowload_uri := strings.Replace(addon_url, "info", "download", -1)
+	path := strings.Replace(addon_url, "info", "download", -1)
 
-	return EsoAddon{addon_name, version, dowload_uri}, nil
+	return EsoAddon{name, version, path}, nil
+}
+
+func eso_live_stat_init(eso_live_name string) (EsoAddon, error) {
+	path := filepath.Join(args.Out_dir, "AddOns", eso_live_name)
+
+	content, error := os.ReadFile(filepath.Join(path, eso_live_name+".txt"))
+	if error != nil {
+		return EsoAddon{}, error
+	}
+
+	version := LIVE_VERSION.FindStringSubmatch(string(content))[1]
+
+	return EsoAddon{eso_live_name, version, path}, nil
 }
