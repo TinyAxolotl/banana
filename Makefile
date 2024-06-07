@@ -17,3 +17,9 @@ run:
 
 install:
 	GOBIN=~/.local/bin/ go install banana.go
+
+install-steamos: banana.elf
+	cp banana.elf /usr/bin/banana
+	cp banana.timer banana.service /etc/systemd/system/
+	systemctl enable banana.timer
+	systemctl enable banana.service
