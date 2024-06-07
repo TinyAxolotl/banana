@@ -124,7 +124,6 @@ https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 	ESO_LIVE_PATH_WINDOWS = `Documents\Elder Scrolls Online\live`
 	ESO_LIVE_PATH_STEAMOS = ".steam/steam/steamapps/compatdata/306130/pfx/drive_c/users/steamuser/Documents/Elder Scrolls Online/live/"
 	TCC_PRICE_TABLE_URI   = "https://us.tamrieltradecentre.com/download/PriceTable"
-	TCC_PRICE_TABLE_NAME  = "TamrielTradeCentre"
 )
 
 var (
