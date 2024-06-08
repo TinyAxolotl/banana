@@ -229,9 +229,26 @@ func eso_ui_stat_init(addon_url string) (EsoAddon, error) {
 		return EsoAddon{}, error
 	}
 
-	name := ESOUI_NAME.FindStringSubmatch(addon_url)[1]
-	version := ESOUI_VERSION.FindStringSubmatch(string(addon_body))[1]
+	var name string
+	names := ESOUI_NAME.FindStringSubmatch(addon_url)
+	if len(names) > 1 {
+		name = names[1]
+	} else {
+		name = ""
+	}
+
+	var version string
+	versions := ESOUI_VERSION.FindStringSubmatch(string(addon_body))
+	if len(versions) > 1 {
+		version = versions[1]
+	} else {
+		version = ""
+	}
+
 	path := string(ESOUI_DOWNLOAD.Find(download_body))
+	if path == "" {
+		return EsoAddon{}, errors.New("Download URI missing " + addon_url)
+	}
 
 	return EsoAddon{name, version, path}, nil
 }
@@ -244,7 +261,13 @@ func eso_live_stat_init(eso_live_name string) (EsoAddon, error) {
 		return EsoAddon{}, error
 	}
 
-	version := LIVE_VERSION.FindStringSubmatch(string(content))[1]
+	var version string
+	versions := LIVE_VERSION.FindStringSubmatch(string(content))
+	if len(versions) > 1 {
+		version = versions[1]
+	} else {
+		version = ""
+	}
 
 	return EsoAddon{eso_live_name, version, path}, nil
 }

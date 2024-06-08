@@ -1,4 +1,4 @@
-EXEs=banana.elf
+EXEs=banana.elf banana.exe
 
 all: tidy clean ${EXEs}
 
@@ -8,12 +8,15 @@ tidy:
 banana.elf:
 	go build -o banana.elf banana.go
 
+banana.exe:
+	GOOS=windows go build -o banana.exe banana.go
+
 clean:
 	go clean
 	-rm ${EXEs}
 
 run:
-	go run banana.go -h
+	go run banana.go -i live/addons.list -o live/AddOns/
 
 install:
 	GOBIN=~/.local/bin/ go install banana.go
