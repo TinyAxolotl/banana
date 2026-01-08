@@ -118,7 +118,7 @@ sudo pacman -S python-pip
 2. Run the following commands to download this project and install the scheduled service.
 
 ```
-wget https://joyo.dev/eso/banana/archive/master.tar.gz -O banana.tgz
+wget https://github.com/TinyAxolotl/banana/archive/refs/heads/master.tar.gz -O banana.tgz
 tar xvf banana.tgz
 cd ./banana/
 pip install .
