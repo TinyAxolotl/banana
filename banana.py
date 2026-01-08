@@ -273,8 +273,8 @@ def periodical_script():
     parser = ArgumentParser(
         description="Visit https://www.esoui.com/ to search for addons and their dependencies URLs. Edit addons.yaml in the ESO live path and add the URL for each addon for installation. "
     )
-    parser.add_argument("-v", "--verbose", action="count", help="verbose logging")
-    parser.add_argument("-l", "--log", action="store_true")
+    parser.add_argument("-v", "--verbose", action="count", help="verbose logging", default=1)
+    parser.add_argument("-l", "--log", action="store_true", default=False)
     parser.add_argument("-p", "--eso_live_path")
     args = parser.parse_args()
 
