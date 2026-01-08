@@ -1,3 +1,13 @@
+## Upstream / Attribution
+
+This repository is a GitHub mirror + maintained fork of the original project:
+- Upstream: https://joyo.dev/eso/banana
+- Original author/maintainer: JoYo (as credited in the upstream repo)
+
+Changes in this fork:
+- restored/maintained the Python-based workflow (tag `python_final` lineage)
+- minor Python refactors/updates
+
 # Elder Scrolls Online Commadline Addon Manager
 
 Elder Scrolls Online addon manager and a Tamriel Trade Centre price table updater.
