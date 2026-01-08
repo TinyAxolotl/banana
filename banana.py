@@ -16,12 +16,12 @@ https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
 https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 """
 
-esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
-esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
-esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
-esoui_download = re.compile('https://cdn.esoui.com/downloads/file[^"]*')
-live_version = re.compile("##\s+Version:\s+.*")
-live_version_split = re.compile("##\s+Version:\s+")
+esoui_prefix = re.compile(r"https://www.esoui.com/downloads/info[0-9]+\-")
+esoui_version_html = re.compile(r'<div\s+id="version">Version:\s+[^<]+')
+esoui_version_split = re.compile(r'<div\s+id="version">Version:\s+')
+esoui_download = re.compile(r'https://cdn.esoui.com/downloads/file[^"]*')
+live_version = re.compile(r"##\s+Version:\s+.*")
+live_version_split = re.compile(r"##\s+Version:\s+")
 
 price_table_uri_NA = "https://us.tamrieltradecentre.com/download/PriceTable"
 price_table_uri_EU = "https://eu.tamrieltradecentre.com/download/PriceTable"
