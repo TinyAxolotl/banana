@@ -2,7 +2,6 @@ from argparse import ArgumentParser
 from io import BytesIO
 from packaging import version
 from pathlib import Path
-from pathlib import Path
 from platform import system
 from shutil import rmtree, copytree
 from tempfile import TemporaryDirectory
