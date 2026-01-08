@@ -16,6 +16,23 @@ https://www.esoui.com/downloads/info1245-TamrielTradeCentre.html
 https://www.esoui.com/downloads/info1146-LibCustomMenu.html
 """
 
+esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
+esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
+esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
+esoui_download = re.compile('https://cdn.esoui.com/downloads/file[^"]*')
+live_version = re.compile("##\s+Version:\s+.*")
+live_version_split = re.compile("##\s+Version:\s+")
+
+price_table_uri_NA = "https://us.tamrieltradecentre.com/download/PriceTable"
+price_table_uri_EU = "https://eu.tamrieltradecentre.com/download/PriceTable"
+
+''' 
+    Please, specify your TTC price table based on your server.
+    In case you are playing on a NA server, select ```price_table_uri_NA```,
+    otherwise use ```price_table_uri_EU```
+'''
+price_table_uri = price_table_uri_EU
+price_table_name = "TamrielTradeCentre"
 
 def config_new(path: Path):
     path.touch(exist_ok=True)
@@ -104,14 +121,6 @@ def esoui_to_live(*, esoui_uris: list, live_path: Path):
             copytree(each, live_dest)
 
         logging.info(f"{addon_name} installed {addon_version} at {live_dest}")
-
-
-esoui_prefix = re.compile("https://www.esoui.com/downloads/info[0-9]+\-")
-esoui_version_html = re.compile('<div\s+id="version">Version:\s+[^<]+')
-esoui_version_split = re.compile('<div\s+id="version">Version:\s+')
-esoui_download = re.compile('https://cdn.esoui.com/downloads/file[^"]*')
-live_version = re.compile("##\s+Version:\s+.*")
-live_version_split = re.compile("##\s+Version:\s+")
 
 
 def esoui_parse(url: str) -> Tuple[str, version.Version, str]:
@@ -359,10 +368,6 @@ def ttc():
         return
 
     ttc_update(live_path=live_path)
-
-
-price_table_uri = "https://us.tamrieltradecentre.com/download/PriceTable"
-price_table_name = "TamrielTradeCentre"
 
 
 def ttc_update(live_path: Path):
