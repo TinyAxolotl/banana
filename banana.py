@@ -186,9 +186,9 @@ def parsing_live(path: Path):
 def eso_live_path_get():
     if system() == "Windows":
         eso_live_path = Path.home().joinpath(
-            "Documents\Elder Scrolls Online\live"
+            "Documents", "Elder Scrolls Online", "live"
         )
-        if eso_live_path.exists:
+        if eso_live_path.exists():
             return eso_live_path
 
     else:
